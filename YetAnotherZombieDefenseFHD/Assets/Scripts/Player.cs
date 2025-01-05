@@ -1,12 +1,12 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Reflection;
 using UnityEngine;
 using YetAnotherZombieDefenceFHD.Resources;
+using BigInt = System.Numerics.BigInteger;
 
 namespace YetAnotherZombieDefenceFHD
 {
-    public class PlayerManager : MonoBehaviour
+    public class Player : MonoBehaviour
     {
         [SerializeField]
         private float moveSpeed = 20f;
@@ -14,12 +14,17 @@ namespace YetAnotherZombieDefenceFHD
         [SerializeField]
         private float rotateSpeed = 10f;
 
+        [field: SerializeField]
+        public HP HP { get; set; }
+
+        public Point Point = default;
+
         private CameraManager cameraManager;
 
         private Quaternion q = default;
         private Rigidbody rb;
 
-        public event Action<Quaternion> OnPlayerMoved;
+        public event Action<Quaternion> OnPlayerRotated;
 
         private void Start()
         {
@@ -28,6 +33,8 @@ namespace YetAnotherZombieDefenceFHD
 
             cameraManager = Camera.main.GetComponent<CameraManager>();
             cameraManager.Players.Add(this);
+
+            Point.OnPointAdded += (totalAmount, addAmount) => Debug.Log($"Total: {totalAmount}, Add: {addAmount}");
         }
 
         private void Update()
@@ -51,7 +58,16 @@ namespace YetAnotherZombieDefenceFHD
             q.SetLookRotation(moveVector, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * rotateSpeed);
 
-            OnPlayerMoved?.Invoke(q);
+            OnPlayerRotated?.Invoke(q);
         }
+
+        public void AddPoint(BigInt amount)
+        {
+            Debug.Log($"{GetType().FullName}.{MethodBase.GetCurrentMethod().Name}");
+
+            Point.AddPoint(amount);
+        }
+
+        public static implicit operator GameObject(Player playerManager) => playerManager.gameObject;
     }
 }

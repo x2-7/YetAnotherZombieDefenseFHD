@@ -12,7 +12,7 @@ namespace YetAnotherZombieDefenceFHD
         [SerializeField]
         private Vector3 positionOffset = new(0f, 20f, -6f);
 
-        public List<PlayerManager> Players = new();
+        public HashSet<Player> Players = new();
 
         private void LateUpdate()
         {
@@ -23,8 +23,9 @@ namespace YetAnotherZombieDefenceFHD
         {
             // プレイヤーの中心座標に移動
             var center = CalcCenterPosition();
-            var lerped = Vector3.Lerp(transform.position, new(center.x + positionOffset.x, positionOffset.y, center.z + positionOffset.z), Time.deltaTime * moveTime);
-            transform.position = lerped; // + positionOffset;
+            var to = new Vector3(center.x + positionOffset.x, positionOffset.y, center.z + positionOffset.z);
+            var lerped = Vector3.Lerp(transform.position, to, Time.deltaTime * moveTime);
+            transform.position = lerped;
         }
 
         /// <summary>
